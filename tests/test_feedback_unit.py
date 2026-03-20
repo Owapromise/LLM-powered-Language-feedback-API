@@ -11,7 +11,7 @@ from app.models import FeedbackRequest
 def _mock_response(response_data: dict) -> MagicMock:
     """Build a mock genai responses output."""
     response = MagicMock()
-    response.output = [MagicMock(content=[MagicMock(text=json.dumps(response_data))])]
+    response.text = json.dumps(response_data)
     return response
 
 
@@ -33,7 +33,7 @@ async def test_feedback_with_errors():
 
     with patch("app.feedback.genai.Client") as MockClient:
         instance = MockClient.return_value
-        instance.responses.generate = MagicMock(return_value=_mock_response(mock_response))
+        instance.models.generate_content = MagicMock(return_value=_mock_response(mock_response))
 
         request = FeedbackRequest(
             sentence="Yo soy fue al mercado ayer.",
@@ -60,7 +60,7 @@ async def test_feedback_correct_sentence():
 
     with patch("app.feedback.genai.Client") as MockClient:
         instance = MockClient.return_value
-        instance.responses.generate = MagicMock(return_value=_mock_response(mock_response))
+        instance.models.generate_content = MagicMock(return_value=_mock_response(mock_response))
 
         request = FeedbackRequest(
             sentence="Ich habe gestern einen interessanten Film gesehen.",
@@ -98,7 +98,7 @@ async def test_feedback_multiple_errors():
 
     with patch("app.feedback.genai.Client") as MockClient:
         instance = MockClient.return_value
-        instance.responses.generate = MagicMock(return_value=_mock_response(mock_response))
+        instance.models.generate_content = MagicMock(return_value=_mock_response(mock_response))
 
         request = FeedbackRequest(
             sentence="La chat noir est sur le table.",

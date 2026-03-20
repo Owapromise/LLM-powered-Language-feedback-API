@@ -1,9 +1,11 @@
 """System prompt and LLM interaction for language feedback."""
 
+import asyncio
 import json
 import os
 
 from google import genai
+from pydantic import json as pydantic_json
 
 from app.models import FeedbackRequest, FeedbackResponse
 
@@ -45,7 +47,7 @@ Respond with valid JSON matching this exact schema:
 
 
 async def get_feedback(request: FeedbackRequest) -> FeedbackResponse:
-    client = genai.Client(api_key=os.environ.get("GENAI_API_KEY"))
+    client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
 
     user_message = (
         f"Target language: {request.target_language}\n"
@@ -53,15 +55,24 @@ async def get_feedback(request: FeedbackRequest) -> FeedbackResponse:
         f"Sentence: {request.sentence}"
     )
 
-    response = client.responses.generate(
-        model="gemini-1.5-mini",
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_message},
-        ],
-        temperature=0.2,
+    loop = asyncio.get_event_loop()
+    response = await asyncio.wait_for(
+        loop.run_in_executor(
+            None,
+            lambda: client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=user_message,
+                config=genai.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                    response_schema=FeedbackResponse,
+                    temperature=0.2
+                )
+            )
+        ),
+        timeout=28.0
     )
 
-    content = response.output[0].content[0].text
+    content = response.text
     data = json.loads(content)
     return FeedbackResponse(**data)
