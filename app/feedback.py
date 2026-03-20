@@ -1,8 +1,9 @@
 """System prompt and LLM interaction for language feedback."""
 
 import json
+import os
 
-from openai import AsyncOpenAI
+from google import genai
 
 from app.models import FeedbackRequest, FeedbackResponse
 
@@ -44,7 +45,7 @@ Respond with valid JSON matching this exact schema:
 
 
 async def get_feedback(request: FeedbackRequest) -> FeedbackResponse:
-    client = AsyncOpenAI()
+    client = genai.Client(api_key=os.environ.get("GENAI_API_KEY"))
 
     user_message = (
         f"Target language: {request.target_language}\n"
@@ -52,16 +53,15 @@ async def get_feedback(request: FeedbackRequest) -> FeedbackResponse:
         f"Sentence: {request.sentence}"
     )
 
-    response = await client.chat.completions.create(
-        model="gpt-4o-mini",
+    response = client.responses.generate(
+        model="gemini-1.5-mini",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_message},
         ],
-        response_format={"type": "json_object"},
         temperature=0.2,
     )
 
-    content = response.choices[0].message.content
+    content = response.output[0].content[0].text
     data = json.loads(content)
     return FeedbackResponse(**data)

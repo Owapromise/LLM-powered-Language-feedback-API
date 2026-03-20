@@ -1,13 +1,7 @@
 """FastAPI application -- language feedback endpoint."""
 
-import os
-
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from typing import List
-from google import genai
-from google.genai import types
+from fastapi import FastAPI
 from app.feedback import get_feedback
 from app.models import FeedbackRequest, FeedbackResponse
 
@@ -18,7 +12,6 @@ app = FastAPI(
     description="Analyzes learner-written sentences and provides structured language feedback.",
     version="1.0.0",
 )
-client = genai.Client(api_key=os.environ.get("GENAI_API_KEY"))
 
 @app.get("/health")
 async def health():

@@ -1,20 +1,18 @@
 """Unit tests -- run without an API key using mocked LLM responses."""
 
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from app.feedback import get_feedback
 from app.models import FeedbackRequest
 
 
-def _mock_completion(response_data: dict) -> MagicMock:
-    """Build a mock ChatCompletion response."""
-    choice = MagicMock()
-    choice.message.content = json.dumps(response_data)
-    completion = MagicMock()
-    completion.choices = [choice]
-    return completion
+def _mock_response(response_data: dict) -> MagicMock:
+    """Build a mock genai responses output."""
+    response = MagicMock()
+    response.output = [MagicMock(content=[MagicMock(text=json.dumps(response_data))])]
+    return response
 
 
 @pytest.mark.asyncio
@@ -33,11 +31,9 @@ async def test_feedback_with_errors():
         "difficulty": "A2",
     }
 
-    with patch("app.feedback.AsyncOpenAI") as MockClient:
+    with patch("app.feedback.genai.Client") as MockClient:
         instance = MockClient.return_value
-        instance.chat.completions.create = AsyncMock(
-            return_value=_mock_completion(mock_response)
-        )
+        instance.responses.generate = MagicMock(return_value=_mock_response(mock_response))
 
         request = FeedbackRequest(
             sentence="Yo soy fue al mercado ayer.",
@@ -62,11 +58,9 @@ async def test_feedback_correct_sentence():
         "difficulty": "B1",
     }
 
-    with patch("app.feedback.AsyncOpenAI") as MockClient:
+    with patch("app.feedback.genai.Client") as MockClient:
         instance = MockClient.return_value
-        instance.chat.completions.create = AsyncMock(
-            return_value=_mock_completion(mock_response)
-        )
+        instance.responses.generate = MagicMock(return_value=_mock_response(mock_response))
 
         request = FeedbackRequest(
             sentence="Ich habe gestern einen interessanten Film gesehen.",
@@ -102,11 +96,9 @@ async def test_feedback_multiple_errors():
         "difficulty": "A1",
     }
 
-    with patch("app.feedback.AsyncOpenAI") as MockClient:
+    with patch("app.feedback.genai.Client") as MockClient:
         instance = MockClient.return_value
-        instance.chat.completions.create = AsyncMock(
-            return_value=_mock_completion(mock_response)
-        )
+        instance.responses.generate = MagicMock(return_value=_mock_response(mock_response))
 
         request = FeedbackRequest(
             sentence="La chat noir est sur le table.",
