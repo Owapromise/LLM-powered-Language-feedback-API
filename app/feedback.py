@@ -4,8 +4,7 @@ import asyncio
 import json
 import os
 
-from google import genai
-from pydantic import json as pydantic_json
+from openai import AsyncOpenAI
 
 from app.models import FeedbackRequest, FeedbackResponse
 
@@ -47,7 +46,7 @@ Respond with valid JSON matching this exact schema:
 
 
 async def get_feedback(request: FeedbackRequest) -> FeedbackResponse:
-    client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+    client = AsyncOpenAI(api_key=os.environ.get("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"))
 
     user_message = (
         f"Target language: {request.target_language}\n"
@@ -55,24 +54,19 @@ async def get_feedback(request: FeedbackRequest) -> FeedbackResponse:
         f"Sentence: {request.sentence}"
     )
 
-    loop = asyncio.get_event_loop()
     response = await asyncio.wait_for(
-        loop.run_in_executor(
-            None,
-            lambda: client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=user_message,
-                config=genai.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
-                    response_mime_type="application/json",
-                    response_schema=FeedbackResponse,
-                    temperature=0.2
-                )
-            )
+        client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_message},
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.2,
         ),
-        timeout=28.0
+        timeout=28.0,
     )
 
-    content = response.text
+    content = response.choices[0].message.content
     data = json.loads(content)
     return FeedbackResponse(**data)

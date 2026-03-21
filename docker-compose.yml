@@ -5,4 +5,4 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - GEMINI_API_KEY=${AIzaSyBn1mR16qS1j8n2NCTxcNelHo2a-1EHW_o}
+      - OPENAI_API_KEY=${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}

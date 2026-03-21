@@ -1,7 +1,7 @@
 """Unit tests -- run without an API key using mocked LLM responses."""
 
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from app.feedback import get_feedback
@@ -31,9 +31,9 @@ async def test_feedback_with_errors():
         "difficulty": "A2",
     }
 
-    with patch("app.feedback.genai.Client") as MockClient:
+    with patch("app.feedback.AsyncOpenAI") as MockClient:
         instance = MockClient.return_value
-        instance.models.generate_content = MagicMock(return_value=_mock_response(mock_response))
+        instance.chat.completions.create = AsyncMock(return_value=MagicMock(choices=[MagicMock(message=MagicMock(content=json.dumps(mock_response)))]))
 
         request = FeedbackRequest(
             sentence="Yo soy fue al mercado ayer.",
@@ -58,9 +58,9 @@ async def test_feedback_correct_sentence():
         "difficulty": "B1",
     }
 
-    with patch("app.feedback.genai.Client") as MockClient:
+    with patch("app.feedback.AsyncOpenAI") as MockClient:
         instance = MockClient.return_value
-        instance.models.generate_content = MagicMock(return_value=_mock_response(mock_response))
+        instance.chat.completions.create = AsyncMock(return_value=MagicMock(choices=[MagicMock(message=MagicMock(content=json.dumps(mock_response)))]))
 
         request = FeedbackRequest(
             sentence="Ich habe gestern einen interessanten Film gesehen.",
@@ -96,9 +96,9 @@ async def test_feedback_multiple_errors():
         "difficulty": "A1",
     }
 
-    with patch("app.feedback.genai.Client") as MockClient:
+    with patch("app.feedback.AsyncOpenAI") as MockClient:
         instance = MockClient.return_value
-        instance.models.generate_content = MagicMock(return_value=_mock_response(mock_response))
+        instance.chat.completions.create = AsyncMock(return_value=MagicMock(choices=[MagicMock(message=MagicMock(content=json.dumps(mock_response)))]))
 
         request = FeedbackRequest(
             sentence="La chat noir est sur le table.",

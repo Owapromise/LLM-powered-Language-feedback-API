@@ -12,8 +12,8 @@ from app.feedback import get_feedback
 from app.models import FeedbackRequest
 
 pytestmark = pytest.mark.skipif(
-    not os.getenv("GOOGLE_API_KEY"),
-    reason="GOOGLE_API_KEY not set -- skipping integration tests",
+    not os.getenv("OPENAI_API_KEY"),
+    reason="OPENAI_API_KEY not set -- skipping integration tests",
 )
 
 VALID_ERROR_TYPES = {
