@@ -4,8 +4,8 @@ import os
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from application.models import FeedbackRequest, FeedbackResponse
-from application.feedback import get_feedback
+from app.models import FeedbackRequest, FeedbackResponse
+from app.feedback import get_feedback
 load_dotenv()
 
 app = FastAPI(

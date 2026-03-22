@@ -5,7 +5,7 @@ from pathlib import Path
 
 import jsonschema
 import pytest
-from application.models import FeedbackRequest, FeedbackResponse
+from app.models import FeedbackRequest, FeedbackResponse
 
 SCHEMA_DIR = Path(__file__).parent.parent / "schema"
 EXAMPLES_DIR = Path(__file__).parent.parent / "examples"
