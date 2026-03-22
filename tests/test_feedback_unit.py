@@ -8,13 +8,6 @@ from app.feedback import get_feedback
 from app.models import FeedbackRequest
 
 
-def _mock_response(response_data: dict) -> MagicMock:
-    """Build a mock genai responses output."""
-    response = MagicMock()
-    response.text = json.dumps(response_data)
-    return response
-
-
 @pytest.mark.asyncio
 async def test_feedback_with_errors():
     mock_response = {
