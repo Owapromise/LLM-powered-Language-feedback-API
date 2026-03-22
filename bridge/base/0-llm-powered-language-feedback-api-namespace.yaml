@@ -1,0 +1,8 @@
+#! 0-llm-powered-language-feedback-api-namespace.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: llm-powered-language-feedback-api
+    labels:
+        com.docker.compose.project: llm-powered-language-feedback-api

@@ -6,7 +6,7 @@ import os
 
 from openai import AsyncOpenAI
 
-from app.models import FeedbackRequest, FeedbackResponse
+from models import FeedbackRequest, FeedbackResponse
 
 SYSTEM_PROMPT = """\
 You are a language-learning assistant. A student is practicing writing in their \
@@ -46,7 +46,7 @@ Respond with valid JSON matching this exact schema:
 
 
 async def get_feedback(request: FeedbackRequest) -> FeedbackResponse:
-    client = AsyncOpenAI(api_key=os.environ.get("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"))
+    client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
     user_message = (
         f"Target language: {request.target_language}\n"

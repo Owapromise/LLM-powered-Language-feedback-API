@@ -4,5 +4,11 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment:
-      - OPENAI_API_KEY=${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}
+    env_file:
+      - file.env
+
+  #frontend:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"

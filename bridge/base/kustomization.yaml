@@ -1,0 +1,10 @@
+#! kustomization.yaml
+# Generated code, do not edit
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+    - 0-llm-powered-language-feedback-api-namespace.yaml
+    - default-network-policy.yaml
+    - feedback-api-deployment.yaml
+    - feedback-api-expose.yaml
+    - feedback-api-service.yaml

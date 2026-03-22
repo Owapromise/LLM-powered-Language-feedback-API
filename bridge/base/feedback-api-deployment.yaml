@@ -1,0 +1,35 @@
+#! feedback-api-deployment.yaml
+# Generated code, do not edit
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: feedback-api
+    namespace: llm-powered-language-feedback-api
+    labels:
+        com.docker.compose.project: llm-powered-language-feedback-api
+        com.docker.compose.service: feedback-api
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            com.docker.compose.project: llm-powered-language-feedback-api
+            com.docker.compose.service: feedback-api
+    strategy:
+        type: Recreate
+    template:
+        metadata:
+            labels:
+                com.docker.compose.project: llm-powered-language-feedback-api
+                com.docker.compose.service: feedback-api
+                com.docker.compose.network.default: "true"
+        spec:
+            containers:
+                - name: feedback-api
+                  image: llm-powered-language-feedback-api-feedback-api
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: OPENAI_API_KEY
+                      value: "proj-wVmaLGkw9gV9CjE6FSHNbCkc1HboJ5hGFnnmuuqf1L8AkVLqHr7yGxdxvWjUY8Ue9rro5g-V2TT3BlbkFJRRf30ZKbpJnrC9niwBSRTYK81UAcLAhNPu0Sp1zVNZTRUA72aNFFyaDfHH3k6R5U_KEzHK_tgA"
+                  ports:
+                    - name: feedback-a-8000
+                      containerPort: 8000

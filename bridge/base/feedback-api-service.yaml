@@ -1,0 +1,21 @@
+# check if there is at least one published port
+
+#! feedback-api-service.yaml
+# Generated code, do not edit
+apiVersion: v1
+kind: Service
+metadata:
+    name: feedback-api-published
+    namespace: llm-powered-language-feedback-api
+    labels:
+        com.docker.compose.project: llm-powered-language-feedback-api
+        com.docker.compose.service: feedback-api
+spec:
+    selector:
+        com.docker.compose.project: llm-powered-language-feedback-api
+        com.docker.compose.service: feedback-api
+    ports:
+        - name: feedback-a-8000
+          port: 8000
+          protocol: TCP
+          targetPort: feedback-a-8000

@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /application
 
 # Install build dependencies needed for packages such as PyYAML
 RUN apt-get update && \
@@ -17,4 +17,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "application.main:app", "--host", "0.0.0.0", "--port", "8000"]
