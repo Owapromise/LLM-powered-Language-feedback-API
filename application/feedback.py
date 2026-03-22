@@ -6,7 +6,7 @@ import os
 
 from openai import AsyncOpenAI
 
-from models import FeedbackRequest, FeedbackResponse
+from application.models import FeedbackRequest, FeedbackResponse
 
 SYSTEM_PROMPT = """\
 You are a language-learning assistant. A student is practicing writing in their \

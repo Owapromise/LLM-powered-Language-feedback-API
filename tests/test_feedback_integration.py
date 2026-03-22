@@ -8,8 +8,8 @@ These tests make real API calls. Skip them in CI or when no key is available.
 import os
 
 import pytest
-from app.feedback import get_feedback
-from app.models import FeedbackRequest
+from application.feedback import get_feedback
+from application.models import FeedbackRequest
 
 pytestmark = pytest.mark.skipif(
     not os.getenv("OPENAI_API_KEY"),

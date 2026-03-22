@@ -4,8 +4,8 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from app.feedback import get_feedback
-from app.models import FeedbackRequest
+from application.feedback import get_feedback
+from application.models import FeedbackRequest
 
 
 def _mock_response(response_data: dict) -> MagicMock:
@@ -31,7 +31,7 @@ async def test_feedback_with_errors():
         "difficulty": "A2",
     }
 
-    with patch("app.feedback.AsyncOpenAI") as MockClient:
+    with patch("application.feedback.AsyncOpenAI") as MockClient:
         instance = MockClient.return_value
         instance.chat.completions.create = AsyncMock(return_value=MagicMock(choices=[MagicMock(message=MagicMock(content=json.dumps(mock_response)))]))
 
