@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Feedback Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">Language Feedback Assistant</h1>
+        
+        <form id="feedback-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Native Language</label>
+                <input type="text" id="native_language" value="English" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Target Language</label>
+                <input type="text" id="target_language" value="Spanish" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Sentence to Check</label>
+                <textarea id="sentence" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border" placeholder="e.g., Yo soy fue al mercado ayer." required></textarea>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-150">
+                Analyze Sentence
+            </button>
+        </form>
+
+        <div id="loading" class="hidden mt-6 text-center text-blue-600 font-semibold">
+            Analyzing sentence with AI...
+        </div>
+        
+        <div id="results" class="hidden mt-8 space-y-4">
+            <h2 class="text-xl font-bold border-b pb-2">Results</h2>
+            <div id="status-badge" class="inline-block px-3 py-1 rounded-full text-sm font-semibold"></div>
+            
+            <div class="bg-gray-50 p-4 rounded border">
+                <p class="text-sm text-gray-500">Corrected Sentence</p>
+                <p id="corrected-sentence" class="text-lg font-medium text-gray-800"></p>
+            </div>
+            
+            <div>
+                <p class="text-sm text-gray-500 mb-2">CEFR Difficulty: <span id="difficulty" class="font-bold text-gray-800"></span></p>
+            </div>
+
+            <div id="errors-container" class="space-y-3">
+                <!-- Errors will be injected here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const sentence = document.getElementById('sentence').value;
+            const targetLanguage = document.getElementById('target_language').value;
+            const nativeLanguage = document.getElementById('native_language').value;
+            
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            
+            try {
+                const response = await fetch('http://localhost:8000/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sentence: sentence,
+                        target_language: targetLanguage,
+                        native_language: nativeLanguage
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Populate results
+                const statusBadge = document.getElementById('status-badge');
+                if (data.is_correct) {
+                    statusBadge.textContent = 'Perfect!';
+                    statusBadge.className = 'inline-block px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800';
+                } else {
+                    statusBadge.textContent = 'Needs Improvement';
+                    statusBadge.className = 'inline-block px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800';
+                }
+                
+                document.getElementById('corrected-sentence').textContent = data.corrected_sentence;
+                document.getElementById('difficulty').textContent = data.difficulty;
+                
+                const errorsContainer = document.getElementById('errors-container');
+                errorsContainer.innerHTML = ''; 
+                
+                if (data.errors && data.errors.length > 0) {
+                    data.errors.forEach(err => {
+                        const errDiv = document.createElement('div');
+                        errDiv.className = 'bg-red-50 p-4 rounded border border-red-100';
+                        errDiv.innerHTML = `
+                            <p class="text-sm font-bold text-red-600 uppercase tracking-wide">${err.error_type.replace('_', ' ')}</p>
+                            <p class="mt-1"><span class="line-through text-red-400">${err.original}</span> <span class="text-green-600 font-bold">→ ${err.correction}</span></p>
+                            <p class="mt-2 text-gray-700 text-sm">${err.explanation}</p>
+                        `;
+                        errorsContainer.appendChild(errDiv);
+                    });
+                }
+                
+                document.getElementById('results').classList.remove('hidden');
+            } catch (error) {
+                alert('Error connecting to the API. Is the backend running on port 8000?');
+                console.error(error);
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
